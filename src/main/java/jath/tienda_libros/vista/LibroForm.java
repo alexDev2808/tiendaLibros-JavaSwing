@@ -44,6 +44,32 @@ public class LibroForm extends JFrame {
             }
         });
         modificarButton.addActionListener(e -> modificarLibro());
+        eliminarButton.addActionListener(e -> eliminarLibro());
+    }
+
+    private void eliminarLibro(){
+
+        var fila = tablaLibros.getSelectedRow();
+        if(fila != -1){
+            String idLibro = tablaLibros.getModel().getValueAt(fila, 0).toString();
+            String nombre = libroTexto.getText();
+
+            var libro = new Libro();
+            libro.setIdLibro(Integer.parseInt(idLibro));
+
+            this.libroServicio.eliminarLibro(libro);
+            mostrarMensaje("Se elimino el libro " + nombre + " exitosamente...");
+
+            limpiarFormulario();
+            listarLibros();
+            agregarBoton.setVisible(true);
+        } else {
+            mostrarMensaje("Debes seleccionar algun libro...");
+        }
+
+
+
+
     }
 
     private void modificarLibro() {
@@ -153,12 +179,20 @@ public class LibroForm extends JFrame {
         idTexto = new JTextField("");
         idTexto.setVisible(false);
 
-        this.tablaModeloLibros = new DefaultTableModel(0, 5);
+        this.tablaModeloLibros = new DefaultTableModel(0, 5){
+            // Evitar que se edite en la tabla(fila)
+            @Override
+            public boolean isCellEditable(int row, int column){
+                return false;
+            }
+        };
         String[] cabeceros = {"Id", "Libro", "Autor", "Precio", "Existencias"};
         this.tablaModeloLibros.setColumnIdentifiers(cabeceros);
 
         // Instanciar objeto JTable
         this.tablaLibros = new JTable(tablaModeloLibros);
+        // Evitar multiple seleccion
+        tablaLibros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listarLibros();
     }
 
