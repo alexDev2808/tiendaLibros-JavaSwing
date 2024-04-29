@@ -1,5 +1,6 @@
 package jath.tienda_libros.vista;
 
+import jath.tienda_libros.modelo.Libro;
 import jath.tienda_libros.servicio.LibroServicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,9 +29,45 @@ public class LibroForm extends JFrame {
     public LibroForm(LibroServicio libroServicio){
         this.libroServicio = libroServicio;
         iniciarForma();
-        agregarBoton.addActionListener(e -> {
+        agregarBoton.addActionListener(e -> agregarLibro());
+    }
 
-        });
+    private void agregarLibro() {
+//        Leer valores del form
+        if(libroTexto.getText().isEmpty()){
+            mostrarMensaje("Proporciona el nombre del Libro");
+            libroTexto.requestFocusInWindow();
+            return;
+        }
+
+        var nombreLibro = libroTexto.getText();
+        var autor = autorTexto.getText();
+        var precio = Double.parseDouble(precioTexto.getText());
+        var existencias = Integer.parseInt(existenciasTexto.getText());
+
+        // Crear objeto Libro
+        var libro = new Libro();
+        libro.setNombreLibro(nombreLibro);
+        libro.setAutor(autor);
+        libro.setPrecio(precio);
+        libro.setExistencias(existencias);
+
+        this.libroServicio.guardarLibro(libro);
+        mostrarMensaje("Se agrego el libro...");
+
+        limpiarFormulario();
+        listarLibros();
+    }
+
+    private void limpiarFormulario() {
+        libroTexto.setText("");
+        autorTexto.setText("");
+        precioTexto.setText("");
+        existenciasTexto.setText("");
+    }
+
+    private void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 
     private void iniciarForma() {
