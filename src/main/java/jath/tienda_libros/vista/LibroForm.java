@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -37,9 +39,42 @@ public class LibroForm extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                agregarBoton.setVisible(false);
                 cargarLibroSeleccionado();
             }
         });
+        modificarButton.addActionListener(e -> modificarLibro());
+    }
+
+    private void modificarLibro() {
+        if (this.idTexto.getText().isEmpty()){
+            mostrarMensaje("Debe seleccionar un registro...");
+        } else{
+
+            //        Leer valores del form
+            if(libroTexto.getText().isEmpty()){
+                mostrarMensaje("Proporciona el nombre del Libro");
+                libroTexto.requestFocusInWindow();
+                return;
+            }
+
+            int idLibro = Integer.parseInt(idTexto.getText());
+            var nombreLibro = libroTexto.getText();
+            var autor = autorTexto.getText();
+            var precio = Double.parseDouble(precioTexto.getText());
+            var existencias = Integer.parseInt(existenciasTexto.getText());
+
+            // Crear objeto Libro
+            var libro = new Libro(idLibro, nombreLibro, autor, precio, existencias);
+
+            this.libroServicio.guardarLibro(libro);
+            mostrarMensaje("Se modifico el libro...");
+
+            limpiarFormulario();
+            listarLibros();
+            agregarBoton.setVisible(true);
+        }
+
     }
 
     private void cargarLibroSeleccionado(){
